@@ -36,6 +36,22 @@ import org.json.JSONObject;
 public class OAuthPlugin extends CordovaPlugin {
     private final String TAG = "OAuthPlugin";
 
+    private String urlScheme;
+    private String urlEndpoint;
+
+    /**
+     * Initializes the plugin.
+     *
+     * This method is called after the WebView has been created but before
+     * any page is loaded. This method is always called on the UI thread.
+     */
+    @Override
+    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+        super.initialize(cordova, webView);
+        this.urlScheme = preferences.getString("OAuthScheme", "default_scheme");
+        this.urlEndpoint = preferences.getString("OAuthEndpoint", "oauth_callback");
+    }
+
     /**
      * Executes the request.
      *
@@ -86,7 +102,7 @@ public class OAuthPlugin extends CordovaPlugin {
 
         final Uri uri = intent.getData();
 
-        if (uri.getHost().equals("oauth_callback")) {
+        if (uri != null && uri.getScheme().equals(this.urlScheme) && uri.getHost().equals(this.urlEndpoint)) {
             LOG.i(TAG, "OAuth called back with parameters.");
 
             try {
